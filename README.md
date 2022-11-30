@@ -1,2 +1,3 @@
-## Grafica per quadChat
-ovviamente non completa
+## Client quadChat con grafica Swing
+
+Fa molto schifo :)
