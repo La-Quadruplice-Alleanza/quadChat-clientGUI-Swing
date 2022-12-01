@@ -2,13 +2,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.net.Socket;
-import java.security.PrivateKey;
-import java.util.Scanner;
 
 import java.awt.BorderLayout;
 import javax.swing.JFrame;
@@ -35,7 +31,7 @@ public class ChatClient extends Thread{
         frame.getContentPane().add(textField, BorderLayout.SOUTH);
         frame.getContentPane().add(new JScrollPane(messageArea), BorderLayout.CENTER);
         frame.pack();
-
+        frame.setSize(800, 600);
         new Thread(){
             public void run(){
                 try{
@@ -49,30 +45,35 @@ public class ChatClient extends Thread{
         textField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e){
                 BigInteger enc;
-                try{
-                    out.writeBytes("SND" + '\n');
-                    int numClient;
-                    sleep(10);
-                    numClient = Integer.parseInt(in.readLine()) - 1;
-                    for(int i = 0; i < numClient; i++){
-                        pubKey[0] = new BigInteger(in.readLine());
-                        pubKey[1] = new BigInteger(in.readLine());
-                        enc = crypt.crypt(privateKey[0], privateKey[1], textField.getText());
-                        enc = crypt.crypt(pubKey[0], pubKey[1], enc);
-                        out.writeBytes(enc.toString() + '\n');
-                        out.writeBytes(publicKey[0].toString() + '\n');
-                        out.writeBytes(publicKey[1].toString() + '\n');
-                    }
-                    out.flush();
-                    messageArea.append('\n' + textField.getText());
+                if(textField.getText().length() == 0){
                     textField.setText("");
-                    new Thread(){
-                       public void run(){
-                            restart();
-                       } 
-                    }.start();
-                }catch(Exception ex){
-                    System.out.println(ex);
+                }
+                else{
+                    try{
+                        out.writeBytes("SND" + '\n');
+                        int numClient;
+                        sleep(10);
+                        numClient = Integer.parseInt(in.readLine()) - 1;
+                        for(int i = 0; i < numClient; i++){
+                            pubKey[0] = new BigInteger(in.readLine());
+                            pubKey[1] = new BigInteger(in.readLine());
+                            enc = crypt.crypt(privateKey[0], privateKey[1], textField.getText());
+                            enc = crypt.crypt(pubKey[0], pubKey[1], enc);
+                            out.writeBytes(enc.toString() + '\n');
+                            out.writeBytes(publicKey[0].toString() + '\n');
+                            out.writeBytes(publicKey[1].toString() + '\n');
+                        }
+                        out.flush();
+                        messageArea.append('\n' + textField.getText());
+                        textField.setText("");
+                        new Thread(){
+                        public void run(){
+                                restart();
+                        } 
+                        }.start();
+                    }catch(Exception ex){
+                        System.out.println(ex);
+                    }
                 }
             }
         });
@@ -116,7 +117,11 @@ public class ChatClient extends Thread{
             out.writeBytes(publicKey[1].toString() + '\n');
 
             do{
-                out.writeBytes(getUsername() + '\n');
+                username = getUsername();
+                if(username == null){
+                    System.exit(2);
+                }
+                out.writeBytes(username + '\n');
             }while(in.readLine().equals("1"));
             textField.setEditable(true);
             while (true) {
