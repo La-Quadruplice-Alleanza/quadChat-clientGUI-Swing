@@ -5,7 +5,7 @@ import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.net.Socket;
-
+import java.util.Base64;
 import java.awt.BorderLayout;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -121,7 +121,7 @@ public class ChatClient extends Thread{
                 if(username == null){
                     System.exit(2);
                 }
-                out.writeBytes(username + '\n');
+                out.writeBytes(Base64.getEncoder().encodeToString(username.getBytes()) + '\n');
             }while(in.readLine().equals("1"));
             textField.setEditable(true);
             while (true) {
@@ -133,6 +133,7 @@ public class ChatClient extends Thread{
                 }while(recv.equals("STPMSG") == true);
                 enc = new BigInteger(recv);
                 username = in.readLine();
+                username = new String(Base64.getDecoder().decode(username));
                 pubOut[0] = new BigInteger(in.readLine());
                 pubOut[1] = new BigInteger(in.readLine());
                 if(username.equals("SERVER") == true){
