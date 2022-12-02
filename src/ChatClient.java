@@ -21,7 +21,6 @@ public class ChatClient extends Thread{
     JFrame frame = new JFrame("quadChat");
     JTextField textField = new JTextField(50);
     JTextArea messageArea = new JTextArea(16, 50);
-
     public ChatClient(BigInteger privateKey[], BigInteger publicKey[]){
         RSA_Cripta crypt = new RSA_Cripta();
         BigInteger pubKey[] = new BigInteger[2];
@@ -45,7 +44,7 @@ public class ChatClient extends Thread{
         textField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e){
                 BigInteger enc;
-                if(textField.getText().length() == 0 || textField.getText().length() >= 50){
+                if(textField.getText().length() == 0 || textField.getText().length() >= 250){
                     textField.setText("");
                     messageArea.append("\n" + "MESSAGGIO NON VALIDO, INVIO RIFIUTATO");
                 }
