@@ -7,7 +7,7 @@ public class RSA_Decripta{
         String msg;
         BigInteger decr;
         decr = cript.modPow(e, n);
-        System.out.println(decr);
+        //System.out.println(decr);
         msg = new String(Base64.getDecoder().decode(decr.toByteArray()));
         return msg;
     }
