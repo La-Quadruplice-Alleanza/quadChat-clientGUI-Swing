@@ -145,6 +145,7 @@ public class ChatClient extends Thread{
                     decr = decrypt.decrypt(pubOut[0], pubOut[1], enc);
                 }
                 messageArea.append('\n' + username + ": " + decr);
+                messageArea.setCaretPosition(messageArea.getDocument().getLength());
             }
         }catch(Exception e){
             System.out.println(e);
