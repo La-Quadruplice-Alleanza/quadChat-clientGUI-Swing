@@ -24,7 +24,7 @@ public class ChatClient extends Thread{
     public ChatClient(BigInteger privateKey[], BigInteger publicKey[]){
         RSA_Cripta crypt = new RSA_Cripta();
         BigInteger pubKey[] = new BigInteger[2];
-        
+        //Palle
         textField.setEditable(false);
         messageArea.setEditable(false);
         frame.getContentPane().add(textField, BorderLayout.SOUTH);
