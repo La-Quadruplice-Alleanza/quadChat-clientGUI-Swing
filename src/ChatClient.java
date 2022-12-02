@@ -45,8 +45,9 @@ public class ChatClient extends Thread{
         textField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e){
                 BigInteger enc;
-                if(textField.getText().length() == 0){
+                if(textField.getText().length() == 0 || textField.getText().length() >= 50){
                     textField.setText("");
+                    messageArea.append("\n" + "MESSAGGIO NON VALIDO, INVIO RIFIUTATO");
                 }
                 else{
                     try{
@@ -87,6 +88,7 @@ public class ChatClient extends Thread{
         return JOptionPane.showInputDialog(frame, "Inserisci l'indirizzo IP del server:", "Connessione al server",
                 JOptionPane.PLAIN_MESSAGE);
     }
+    
 
     synchronized private void runClient(BigInteger privateKey[], BigInteger publicKey[]) throws Exception{
         this.frame.setTitle("quadChat (Premi invio per inviare un messaggio)");
