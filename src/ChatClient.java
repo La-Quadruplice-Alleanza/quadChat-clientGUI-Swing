@@ -95,7 +95,7 @@ public class ChatClient extends Thread{
         return JOptionPane.showInputDialog(frame, "Inserisci l'indirizzo IP del server:", "Connessione al server",
                 JOptionPane.PLAIN_MESSAGE);
     }
-    private void serverClosed() { //Dialog per l'input dell'IP/hostname
+    private void serverClosed() { //Dialog per l'uscita causata dalla chiusura del server
         JOptionPane.showMessageDialog(frame, "Il server alla quale ti eri connesso è stato chiuso", "Server chiuso",
         JOptionPane.ERROR_MESSAGE);
     }
