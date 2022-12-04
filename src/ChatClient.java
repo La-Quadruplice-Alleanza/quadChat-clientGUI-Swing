@@ -66,7 +66,7 @@ public class ChatClient extends Thread{
                 BigInteger enc;
                 if(textField.getText().length() == 0 || textField.getText().length() > 250){ //Controllo sulla lunghezza del messaggio
                     textField.setText("");
-                    addColoredText(messageArea,'\n' + "MESSAGGIO NON VALIDO, INVIO RIFIUTATO", Color.RED, 0);
+                    addColoredText(messageArea, "MESSAGGIO NON VALIDO, INVIO RIFIUTATO\n", Color.RED, 0);
                 }
                 else{
                     try{
