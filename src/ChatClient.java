@@ -1,5 +1,4 @@
 import java.awt.*;
-import java.awt.TrayIcon.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -12,30 +11,44 @@ import java.net.Socket;
 import java.util.Base64;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.BorderFactory;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 public class ChatClient extends Thread{
     String serverAddress;
     BufferedReader in;
     DataOutputStream out;
     JFrame frame = new JFrame("quadChat");
+    JLabel invia = new JLabel();
     JTextField textField = new JTextField(50);
-    JTextArea messageArea = new JTextArea(16, 50);
-
+    JTextPane messageArea = new JTextPane();
+    Color green = new Color(0, 153, 76);
     public ChatClient(BigInteger privateKey[], BigInteger publicKey[]) throws Exception{
         RSA_Cripta crypt = new RSA_Cripta();
         BigInteger pubKey[] = new BigInteger[2];
-
         //Impostazioni finestra (aggiunta textView/textBox/risoluzione)
         textField.setEditable(false);
         messageArea.setEditable(false);
         frame.getContentPane().add(textField, BorderLayout.SOUTH);
         frame.getContentPane().add(new JScrollPane(messageArea), BorderLayout.CENTER);
+        textField.setBorder(BorderFactory.createEmptyBorder());
+        JScrollPane scrollPane = new JScrollPane(messageArea);
+        frame.add(scrollPane, BorderLayout.CENTER);
         frame.pack();
         frame.setSize(800, 600);
+        messageArea.setBackground(Color.LIGHT_GRAY);
+
+        Font font = new Font("Font", Font.BOLD, 18);
+        messageArea.setFont(font);
 
         //Inizio thread runClient
         new Thread(){
@@ -53,7 +66,7 @@ public class ChatClient extends Thread{
                 BigInteger enc;
                 if(textField.getText().length() == 0 || textField.getText().length() > 250){ //Controllo sulla lunghezza del messaggio
                     textField.setText("");
-                    messageArea.append("\n" + "MESSAGGIO NON VALIDO, INVIO RIFIUTATO");
+                    addColoredText(messageArea,'\n' + "MESSAGGIO NON VALIDO, INVIO RIFIUTATO", Color.RED, 0);
                 }
                 else{
                     try{
@@ -71,7 +84,8 @@ public class ChatClient extends Thread{
                             out.writeBytes(publicKey[1].toString() + '\n');
                         }
                         out.flush(); //Flush del buffer (non si sa mai)
-                        messageArea.append('\n' + textField.getText()); //Il messaggio in chiaro viene messo in output nel client
+                        addColoredText(messageArea," " + "IO:" + textField.getText() + " " + '\n', green, 1);//Il messaggio in chiaro viene messo in output nel client
+                        messageArea.setCaretPosition(messageArea.getDocument().getLength()); //La textArea fa lo scrolling automatico 
                         textField.setText(""); //La barra di testo viene resettata
 
                         new Thread(){ //Il thread della lettura dei messaggi riprende l'esecuzione
@@ -152,11 +166,12 @@ public class ChatClient extends Thread{
                 pubOut[1] = new BigInteger(in.readLine());
                 if(username.equals("SERVER") == true){ //Controllo se l'username è SERVER (in caso di annuncio di connessione/disconnessione da parte del server, li il messaggio viene criptato solo con una coppia di chiavi)
                     decr = decrypt.decrypt(pubOut[0], pubOut[1], enc);
+                    addColoredText(messageArea," " + username + ": " + decr + " " +"\n", Color.RED, 0);//Il messaggio in output viene messo in output insieme all'username
                 }else{
                     enc = decrypt.decrypt_bi(privateKey[0], privateKey[1], enc);
                     decr = decrypt.decrypt(pubOut[0], pubOut[1], enc);
+                    addColoredText(messageArea," " + username + ": " + decr + " " +"\n", new Color(64, 64, 64), 0);//Il messaggio in output viene messo in output insieme all'username
                 }
-                messageArea.append('\n' + username + ": " + decr); //Il messaggio in output viene messo in output insieme all'username
                 messageArea.setCaretPosition(messageArea.getDocument().getLength()); //La textArea fa lo scrolling automatico 
             }
         }catch(Exception e){
@@ -188,5 +203,28 @@ public class ChatClient extends Thread{
 
     synchronized public void restart(){
         notify();
+    }
+    
+    public void addColoredText(JTextPane pane, String text, Color color, int isCurrentUser) {
+        StyledDocument doc = pane.getStyledDocument();
+        SimpleAttributeSet left = new SimpleAttributeSet();
+        StyleConstants.setAlignment(left, StyleConstants.ALIGN_LEFT);
+
+        MutableAttributeSet style = pane.addStyle("Color Style", null);
+        StyleConstants.setBackground(style, color);
+        StyleConstants.setForeground(style, Color.WHITE);
+        doc.setParagraphAttributes(doc.getLength(), 1, left, false);
+
+        if(isCurrentUser == 1){
+            SimpleAttributeSet right = new SimpleAttributeSet();
+            StyleConstants.setAlignment(right, StyleConstants.ALIGN_RIGHT);
+            doc.setParagraphAttributes(doc.getLength(), 1, right, false);
+        }
+        try {
+            doc.insertString(doc.getLength(), text, style);
+        } 
+        catch (BadLocationException e) {
+            e.printStackTrace();
+        }           
     }
 }
