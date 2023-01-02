@@ -74,10 +74,10 @@ public class ChatClient extends Thread{
                         int numClient;
                         sleep(10); //10ms di delay prima del prossimo readline, così i 2 thread si desincronizzano e non ci sono problemi di concorrenza
                         numClient = Integer.parseInt(in.readLine()) - 1; //Lettura numero client connessi (meno quello attuale)
+                        enc = crypt.crypt(privateKey[0], privateKey[1], textField.getText()); //Messaggio viene criptato con la privata del client mittente
                         for(int i = 0; i < numClient; i++){
                             pubKey[0] = new BigInteger(in.readLine()); //Lettura chiave pubblica client destinatario
                             pubKey[1] = new BigInteger(in.readLine());
-                            enc = crypt.crypt(privateKey[0], privateKey[1], textField.getText()); //Messaggio viene criptato con la privata del client mittente
                             enc = crypt.crypt(pubKey[0], pubKey[1], enc); //Messaggio viene criptato con la pubblica del client destinatario
                             out.writeBytes(enc.toString() + '\n'); //Messaggio/chiavi vengono inviati al server
                             out.writeBytes(publicKey[0].toString() + '\n');
