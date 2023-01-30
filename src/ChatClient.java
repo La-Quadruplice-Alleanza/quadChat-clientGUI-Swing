@@ -80,8 +80,6 @@ public class ChatClient extends Thread{
                             enc = crypt.crypt(privateKey[0], privateKey[1], textField.getText()); //Messaggio viene criptato con la privata del client mittente
                             enc = crypt.crypt(pubKey[0], pubKey[1], enc); //Messaggio viene criptato con la pubblica del client destinatario
                             out.writeBytes(enc.toString() + '\n'); //Messaggio/chiavi vengono inviati al server
-                            out.writeBytes(publicKey[0].toString() + '\n');
-                            out.writeBytes(publicKey[1].toString() + '\n');
                         }
                         out.flush(); //Flush del buffer (non si sa mai)
                         addColoredText(messageArea," " + "IO:" + textField.getText() + " " + '\n', green, 1);//Il messaggio in chiaro viene messo in output nel client
