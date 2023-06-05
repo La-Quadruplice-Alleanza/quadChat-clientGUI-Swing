@@ -6,7 +6,7 @@ public class RSA_GenKey {
     public BigInteger[] GenKeys() throws Exception{
         BigInteger p, q, n, z, e, d;
         //RandomAccessFile listaNumeriPrimi = new RandomAccessFile("numprimi.txt", "r");
-        FileReader f = new FileReader("numprimi.txt");
+        FileReader f = new FileReader("quadChat-clientGUI-Swing-main\numprimi.txt");
         BufferedReader listaNumeriPrimi = new BufferedReader(f);
         long lines = 0;
         long i;
@@ -34,7 +34,7 @@ public class RSA_GenKey {
 
         //listaNumeriPrimi.seek(0);
         f.close();
-        f = new FileReader("numprimi.txt");
+        f = new FileReader("quadChat-clientGUI-Swing-main/numprimi.txt");
         listaNumeriPrimi = new BufferedReader(f);
 
         for(i = 0; i < rigaCasualeP; i++){
@@ -42,7 +42,7 @@ public class RSA_GenKey {
         }
         //listaNumeriPrimi.seek(0);
         f.close();
-        f = new FileReader("numprimi.txt");
+        f = new FileReader("quadChat-clientGUI-Swing-main/numprimi.txt");
         listaNumeriPrimi = new BufferedReader(f);
         for(i = 0; i < rigaCasualeQ; i++){
             q = new BigInteger(listaNumeriPrimi.readLine());
@@ -55,7 +55,7 @@ public class RSA_GenKey {
 
         //listaNumeriPrimi.seek(0);
         f.close();
-        f = new FileReader("numprimi.txt");
+        f = new FileReader("quadChat-clientGUI-Swing-main/numprimi.txt");
         listaNumeriPrimi = new BufferedReader(f);
         e = new BigInteger("0");
         for(i = 0; i < rigaCasualeE; i++){

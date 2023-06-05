@@ -10,9 +10,11 @@ import java.math.BigInteger;
 import java.net.Socket;
 import java.util.Base64;
 
+import javax.swing.JButton; 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
@@ -31,6 +33,8 @@ public class ChatClient extends Thread{
     JLabel invia = new JLabel();
     JTextField textField = new JTextField(50);
     JTextPane messageArea = new JTextPane();
+    JButton invio =new javax.swing.JButton("invio");
+    JPanel p = new JPanel();
     Color green = new Color(0, 153, 76);
     public ChatClient(BigInteger privateKey[], BigInteger publicKey[]) throws Exception{
         RSA_Cripta crypt = new RSA_Cripta();
@@ -38,7 +42,13 @@ public class ChatClient extends Thread{
         //Impostazioni finestra (aggiunta textView/textBox/risoluzione)
         textField.setEditable(false);
         messageArea.setEditable(false);
-        frame.getContentPane().add(textField, BorderLayout.SOUTH);
+        //frame.getContentPane().add(textField, BorderLayout.SOUTH);
+        //invio.setText("bottone");
+        //invio.setSize(25, 25);
+        //frame.getContentPane().add(invio, BorderLayout.SOUTH);
+        p.add(textField);
+        p.add(invio);
+        frame.getContentPane().add(p, BorderLayout.SOUTH);
         frame.getContentPane().add(new JScrollPane(messageArea), BorderLayout.CENTER);
         textField.setBorder(BorderFactory.createEmptyBorder());
         JScrollPane scrollPane = new JScrollPane(messageArea);
@@ -62,6 +72,43 @@ public class ChatClient extends Thread{
         }.start();
         //Routine per l'invio del messaggio
         textField.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e){
+                BigInteger enc;
+                if(textField.getText().length() == 0 || textField.getText().length() > 250){ //Controllo sulla lunghezza del messaggio
+                    textField.setText("");
+                    addColoredText(messageArea, "MESSAGGIO NON VALIDO, INVIO RIFIUTATO\n", Color.RED, 0);
+                }
+                else{
+                    try{
+                        out.writeBytes("SND" + '\n'); //Invio richiesta di invio al server (il thread della lettura dei messaggi riceve una richiesta di wait dal server)
+                        int numClient;
+                        sleep(10); //10ms di delay prima del prossimo readline, così i 2 thread si desincronizzano e non ci sono problemi di concorrenza
+                        numClient = Integer.parseInt(in.readLine()) - 1; //Lettura numero client connessi (meno quello attuale)
+                        for(int i = 0; i < numClient; i++){
+                            pubKey[0] = new BigInteger(in.readLine()); //Lettura chiave pubblica client destinatario
+                            pubKey[1] = new BigInteger(in.readLine());
+                            enc = crypt.crypt(privateKey[0], privateKey[1], textField.getText()); //Messaggio viene criptato con la privata del client mittente
+                            enc = crypt.crypt(pubKey[0], pubKey[1], enc); //Messaggio viene criptato con la pubblica del client destinatario
+                            out.writeBytes(enc.toString() + '\n'); //Messaggio/chiavi vengono inviati al server
+                        }
+                        out.flush(); //Flush del buffer (non si sa mai)
+                        addColoredText(messageArea," " + "IO:" + textField.getText() + " " + '\n', green, 1);//Il messaggio in chiaro viene messo in output nel client
+                        messageArea.setCaretPosition(messageArea.getDocument().getLength()); //La textArea fa lo scrolling automatico 
+                        textField.setText(""); //La barra di testo viene resettata
+
+                        new Thread(){ //Il thread della lettura dei messaggi riprende l'esecuzione
+                            public void run(){
+                                    restart();
+                            } 
+                        }.start();
+                    }catch(Exception ex){
+                        System.out.println(ex);
+                    }
+                }
+            }
+        });
+
+        invio.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e){
                 BigInteger enc;
                 if(textField.getText().length() == 0 || textField.getText().length() > 250){ //Controllo sulla lunghezza del messaggio
